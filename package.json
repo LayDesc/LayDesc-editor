@@ -1,0 +1,30 @@
+{
+  "name": "laydesc-editor",
+  "version": "0.0.1",
+  "description": "LayDesc editor is an open-source html editor (based on Electron) to make the LayDesc document edition easier and more intelligible.",
+  "main": "dist/main.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/LayDesc/LayDesc-editor.git"
+  },
+  "keywords": [
+    "LayDesc",
+    "layout-tools",
+    "layout",
+    "print",
+    "graphic-design",
+    "pdf",
+    "pdf-document",
+    "editor",
+    "application",
+    "electron-application"
+  ],
+  "author": "nicolas baldran",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/LayDesc/LayDesc-editor/issues"
+  },
+  "homepage": "https://github.com/LayDesc/LayDesc-editor#readme"
+}
