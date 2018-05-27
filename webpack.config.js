@@ -115,6 +115,7 @@ const client_main = {
         filename: 'main.js',
         path: path.join(clientDistDirectory, clientWindowNames.main),
     },
+    target: clientsOptions.target,
     resolve: clientsOptions.resolve,
     module: clientsOptions.module,
 };
@@ -133,6 +134,7 @@ const client_generator = {
         filename: 'main.js',
         path: path.join(clientDistDirectory, clientWindowNames.generator),
     },
+    target: clientsOptions.target,
     resolve: clientsOptions.resolve,
     module: clientsOptions.module,
 };

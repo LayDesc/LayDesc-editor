@@ -1,4 +1,4 @@
-import {app, BrowserWindow} from "electron";
+import {app, BrowserWindow, ipcMain} from "electron";
 
 // Gardez une reference globale de l'objet window, si vous ne le faites pas, la fenetre sera
 // fermee automatiquement quand l'objet JavaScript sera garbage collected.
@@ -53,13 +53,18 @@ function createWindow () {
         }
     });
 
+    ipcMain.on("reply", (event: Event, reply: string) => {
+        console.log(reply);
+        (mainWindow as Electron.BrowserWindow).webContents.send("message", reply);
+    });
+
     // Émit lorsque la fenêtre est fermée.
     mainWindow.on('closed', () => {
         // Dé-référence l'objet window , normalement, vous stockeriez les fenêtres
         // dans un tableau si votre application supporte le multi-fenêtre. C'est le moment
         // où vous devez supprimer l'élément correspondant.
         mainWindow = null;
-    })
+    });
 }
 
 // Cette méthode sera appelée quant Electron aura fini
@@ -85,3 +90,5 @@ app.on('activate', () => {
 });
 
 // Dans ce fichier, vous pouvez inclure le reste de votre code spécifique au processus principal. Vous pouvez également le mettre dans des fichiers séparés et les inclure ici.
+
+// https://medium.com/@kahlil/how-to-communicate-between-two-electron-windows-166fdbcdc469
