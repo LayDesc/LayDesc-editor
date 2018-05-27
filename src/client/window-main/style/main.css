@@ -1,0 +1,30 @@
+html,
+body {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    font-family: "Poppins", sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+#header-app {
+    background-color: blue;
+    width: 100%;
+    padding: 0 70px 2px;
+    overflow: hidden;
+    box-sizing: border-box;
+    text-align: center;
+    -webkit-app-region: drag;
+    white-space: nowrap;
+}
+
+#header-app h1 {
+    font-weight: 400;
+    margin: 0;
+    font-size: 14px;
+    color: white;
+    line-height: 20px;
+    overflow: hidden;
+}
