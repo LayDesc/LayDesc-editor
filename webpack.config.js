@@ -40,6 +40,7 @@ const electron = {
 };
 
 const clientsOptions = {
+    target: "electron-renderer",
     resolve: {
         extensions: [".ts", ".tsx", ".js"]
     },
