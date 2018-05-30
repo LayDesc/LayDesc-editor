@@ -1,4 +1,5 @@
 import {app, BrowserWindow, ipcMain} from "electron";
+import {IpcChannels} from "../_typescript-declarations/IpcChannels";
 
 // Gardez une reference globale de l'objet window, si vous ne le faites pas, la fenetre sera
 // fermee automatiquement quand l'objet JavaScript sera garbage collected.
@@ -34,7 +35,7 @@ function createWindow () {
                 height: 500,
                 parent: (mainWindow as Electron.BrowserWindow),
                 // resizable: false
-                // show: false,
+                show: false,
             };
 
             Object.assign(options, windowOptions);
@@ -48,13 +49,18 @@ function createWindow () {
 
             newWindow.webContents.on('did-finish-load', () => {
                 newWindow.webContents.openDevTools();
+
                 newWindow.webContents.send('message', 'Hello second window!');
+            });
+
+            ipcMain.on(IpcChannels.WindowMain.RENDERER, (event: Event) => {
+                console.log("sending");
+                newWindow.webContents.send(IpcChannels.App.RENDERER);
             });
         }
     });
 
     ipcMain.on("reply", (event: Event, reply: string) => {
-        console.log(reply);
         (mainWindow as Electron.BrowserWindow).webContents.send("message", reply);
     });
 
