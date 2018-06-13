@@ -15,6 +15,10 @@ declare interface selfMonaco extends Window {
 export class Editor {
     editor: monaco.editor.IStandaloneCodeEditor;
 
+    get cursorPosition() {
+        return this.editor.getPosition() as monaco.Position;
+    };
+
     constructor() {
 
         this._setPersonalTheme();
@@ -106,10 +110,10 @@ export class Editor {
             .then(worker => worker(this.editor.getModel().uri))
     }
 
-    public getTokenAtPosition(position: monaco.Position) {
+    public getTokenAtCursorPosition() {
         let tokenWord: monaco.Token | null = null;
-        for(const token of this.getTokensAtLine(position.lineNumber)) {
-            if(token.offset > position.column - 1) {
+        for(const token of this.getTokensAtLine(this.editor.getPosition().lineNumber)) {
+            if(token.offset > this.editor.getPosition().column - 1) {
                 break;
             }
             tokenWord = token;
@@ -125,7 +129,7 @@ export class Editor {
         return monaco.editor.tokenize(this.editor.getModel().getValue(), "typescript")
     }
 
-    public getWordAtPosition(position: monaco.Position) {
-        return this.editor.getModel().getWordAtPosition(position)
+    public getWordAtCursorPosition() {
+        return this.editor.getModel().getWordAtPosition(this.editor.getPosition());
     }
 }

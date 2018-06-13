@@ -2,6 +2,8 @@
 
 import {Editor} from "./script/Editor";
 import {MonacoInitializer} from "./script/MonacoInitializer";
+import {LIBRARY_WORD} from "./script/LIBRARY_WORD";
+import {PositionParser} from "./script/lexer/PositionParser";
 
 require("./index.html");
 
@@ -12,10 +14,13 @@ new MonacoInitializer(() => {
     let isNumberIncremental = false;
 
     editor.editor.onDidChangeCursorPosition((e) => {
-        console.log(editor.getWordAtPosition(e.position) );
-        console.log(editor.getTokenAtPosition( e.position ));
+        console.log(editor.getWordAtCursorPosition() );
+        console.log(editor.getTokenAtCursorPosition());
 
-        isNumberIncremental = editor.getTokenAtPosition(e.position).type === "number.ts";
+        isNumberIncremental = editor.getTokenAtCursorPosition().type === "number.ts";
+
+        cleanUIPlugin();
+        UIPlugin();
     });
 
     editor.editor.onDidChangeModelContent(() => {
@@ -24,6 +29,32 @@ new MonacoInitializer(() => {
                 console.log("value", value);
             });
     });
+
+
+    let _userInterface: HTMLElement | null = null;
+    function UIPlugin() {
+        if (editor.getTokenAtCursorPosition().type === "identifier.ts") {
+            if(editor.getWordAtCursorPosition().word === LIBRARY_WORD.POSITION) {
+                new PositionParser(editor)
+                    .createUserInterface()
+                    .then((value) => {
+                        if( typeof value === "string") {
+                            console.error(value);
+                        } else {
+                            console.log("OK");
+                            _userInterface = (value as HTMLElement);
+                            document.body.appendChild(_userInterface );
+                        }
+                    });
+            }
+        }
+    }
+    function cleanUIPlugin() {
+        if(_userInterface !== null) {
+            document.body.removeChild(_userInterface);
+            _userInterface = null;
+        }
+    }
 
     function injectNumberAtPosition(value: number, startLineNumber: number, startColumn: number, endLineNumber: number, endColumn: number) {
         editor.editor.executeEdits("float-incrementation-source", [
@@ -47,13 +78,13 @@ new MonacoInitializer(() => {
         ],
         run: () => {
             if (isNumberIncremental) {
-                const newNumber = parseFloat(editor.getWordAtPosition(editor.editor.getPosition()).word) + 1;
+                const newNumber = parseFloat(editor.getWordAtCursorPosition().word) + 1;
                 injectNumberAtPosition(
                     newNumber,
                     editor.editor.getPosition().lineNumber,
-                    editor.getWordAtPosition(editor.editor.getPosition()).startColumn,
+                    editor.getWordAtCursorPosition().startColumn,
                     editor.editor.getPosition().lineNumber,
-                    editor.getWordAtPosition(editor.editor.getPosition()).endColumn,
+                    editor.getWordAtCursorPosition().endColumn,
                 );
             }
         }
@@ -66,14 +97,14 @@ new MonacoInitializer(() => {
         ],
         run: () => {
             if (isNumberIncremental) {
-                const newNumber = parseFloat(editor.getWordAtPosition(editor.editor.getPosition()).word) - 1;
+                const newNumber = parseFloat(editor.getWordAtCursorPosition().word) - 1;
 
                 injectNumberAtPosition(
                     newNumber,
                     editor.editor.getPosition().lineNumber,
-                    editor.getWordAtPosition(editor.editor.getPosition()).startColumn,
+                    editor.getWordAtCursorPosition().startColumn,
                     editor.editor.getPosition().lineNumber,
-                    editor.getWordAtPosition(editor.editor.getPosition()).endColumn,
+                    editor.getWordAtCursorPosition().endColumn,
                 );
             }
         }

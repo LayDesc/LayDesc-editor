@@ -1,6 +1,5 @@
 export function getEditorValue() {
-    return `
-import * as layDesc from 'main'
+    return `import * as layDesc from 'main'
 /**
  * layDesc internal
  */
@@ -54,7 +53,19 @@ const TextMetric = layDesc.tools.TextMetric
 const doc: Document = new Document({
     arrayOfPage: [
         {
-            containers: [],
+            containers: [
+                {
+                    position: {
+                        x: 10,
+                        y: 10,
+                    },
+                    texts: [
+                        {
+                            content: "hello"
+                        }
+                    ]
+                }
+            ],
             name: "hello",
             pageMargin: {
                 bottom: 10,
