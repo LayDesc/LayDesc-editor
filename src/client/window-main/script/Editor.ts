@@ -1,3 +1,7 @@
+import * as ts from "typescript";
+import {getEditorValue} from "./getEditorValue";
+import {getDescription} from "./layDescDescription";
+
 declare const amdRequire: any;
 
 declare interface selfMonaco extends Window {
@@ -13,6 +17,20 @@ export class Editor {
 
     constructor() {
 
+        this._setPersonalTheme();
+        this._addLayDescLibrary();
+
+        this.editor = monaco.editor.create(document.getElementById('editor') as HTMLElement, {
+            value: getEditorValue(),
+            language: 'typescript',
+            fontLigatures:  true,
+            theme: "myCustomTheme",
+        });
+
+        this._setAutoResizing();
+    }
+
+    private _setPersonalTheme() {
         monaco.editor.defineTheme('myCustomTheme', {
             base: 'vs-dark', // can also be vs-dark or hc-black
             inherit: true, // can also be false to completely replace the builtin rules
@@ -23,81 +41,91 @@ export class Editor {
             ],
             colors: {}
         });
+    }
 
+    private _addLayDescLibrary() {
+        monaco.languages.typescript.typescriptDefaults.addExtraLib(getDescription());
+    }
 
-        this.editor = monaco.editor.create(document.getElementById('editor') as HTMLElement, {
-            value: `
-import * as layDesc from 'main'
-/**
- * layDesc internal
- */
-type IRectangleContainerData = layDesc.containers.IRectangleContainerData
-type IRectangleContainerSettings = layDesc.containers.IRectangleContainerSettings
-type RectangleContainer = layDesc.containers.RectangleContainer
-const RectangleContainer = layDesc.containers.RectangleContainer
-
-type Document = layDesc.document.Document
-const Document = layDesc.document.Document
-
-type Font = layDesc.elements.Font
-const Font = layDesc.elements.Font
-type Image = layDesc.elements.Image
-const Image = layDesc.elements.Image
-type Text = layDesc.elements.Text
-const Text = layDesc.elements.Text
-type TextStyle = layDesc.elements.TextStyle
-const TextStyle = layDesc.elements.TextStyle
-
-type ANCHOR = layDesc.geometry.ANCHOR
-const ANCHOR = layDesc.geometry.ANCHOR
-type Padding = layDesc.geometry.Padding
-const Padding = layDesc.geometry.Padding
-type Position = layDesc.geometry.Position
-const Position = layDesc.geometry.Position
-type Rectangle = layDesc.geometry.Rectangle
-const Rectangle = layDesc.geometry.Rectangle
-type Size = layDesc.geometry.Size
-const Size = layDesc.geometry.Size
-type UNIT = layDesc.geometry.UNIT
-const UNIT = layDesc.geometry.UNIT
-
-type Horizontal = layDesc.guide.Horizontal
-const Horizontal = layDesc.guide.Horizontal
-type Vertical = layDesc.guide.Vertical
-const Vertical = layDesc.guide.Vertical
-
-type Page = layDesc.page.Page
-const Page = layDesc.page.Page
-type PageTemplate = layDesc.page.PageTemplate
-const PageTemplate = layDesc.page.PageTemplate
-
-const loremIpsum = layDesc.tools.loremIpsum
-type RectangleContainerGenerator = layDesc.tools.RectangleContainerGenerator
-const RectangleContainerGenerator = layDesc.tools.RectangleContainerGenerator
-type TextMetric = layDesc.tools.TextMetric
-const TextMetric = layDesc.tools.TextMetric
-/** */
-
-const doc: Document = new Document({
-    arrayOfPage: [
-        {
-            containers: [],
-            name: "hello",
-            pageMargin: {
-                bottom: 10,
-                left: 10,
-                right: 10,
-                top: 10,
-            },
-            pageTemplateName: "hello",
-            unit: UNIT.PX,
-        }
-    ]
-});
-        `,
-            language: 'typescript',
-            fontLigatures:  true,
-            theme: "myCustomTheme",
+    private _setAutoResizing() {
+        window.addEventListener("resize", () => {
+            this.editor.layout();
         });
+    }
+
+    public getJavascriptCompiled() {
+        return new Promise((resolve, reject) => {
+            this.getTypescriptService()
+                .then(
+                    service => {
+                        return service.getEmitOutput(this.editor.getModel().uri.toString())
+                    },
+                    reason => {
+                        reject(reason)
+                    })
+                .then(
+                    (result: ts.EmitOutput) => {
+                        if (result.emitSkipped) {
+                            return false;
+                        }
+
+                        if (!result.outputFiles || !result.outputFiles[0]) {
+                            return false;
+                        }
+
+                        return result.outputFiles[0].text;
+                    },
+                    reason => {
+                        reject(reason)
+                    })
+                .then(
+                    text => {
+                        if (typeof text === 'string') {
+                            text = text.replace(/import[^;|\n]*(;|\n)/gm, "");
+                            resolve(text);
+                        } else {
+                            reject(text);
+                        }
+                        return !!text;
+                    },
+                    reason => {
+                        reject(reason)
+                    })
+                .then(
+                    updated => {
+                        console.log("typescript compilation updated: ", updated);
+                    },
+                    reason => {
+                        console.log("typescript compilation ERROR: ", reason)
+                    });
+        });
+    }
+
+    public getTypescriptService(): monaco.Promise<any> {
+        return monaco.languages.typescript.getTypeScriptWorker()
+            .then(worker => worker(this.editor.getModel().uri))
+    }
+
+    public getTokenAtPosition(position: monaco.Position) {
+        let tokenWord: monaco.Token | null = null;
+        for(const token of this.getTokensAtLine(position.lineNumber)) {
+            if(token.offset > position.column - 1) {
+                break;
+            }
+            tokenWord = token;
+        }
+        return tokenWord as monaco.Token;
+    }
+
+    public getTokensAtLine(lineNumber: number) {
+        return this.getAllTokensInCurrentText()[lineNumber - 1];
+    }
+
+    public getAllTokensInCurrentText() {
+        return monaco.editor.tokenize(this.editor.getModel().getValue(), "typescript")
+    }
+
+    public getWordAtPosition(position: monaco.Position) {
+        return this.editor.getModel().getWordAtPosition(position)
     }
 }
