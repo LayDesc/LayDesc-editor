@@ -26,12 +26,13 @@ export class PositionParser {
     private static _initUserInterface() {
         const UIContainer = document.createElement("div");
         UIContainer.style.backgroundColor = "white";
-        UIContainer.style.width = "100px";
-        UIContainer.style.height = "100px";
+        UIContainer.style.width = "400px";
+        UIContainer.style.height = "250px";
         UIContainer.style.position = "absolute";
-        UIContainer.style.top = "50px";
+        UIContainer.style.top = "22px";
         UIContainer.style.left = "50%";
         UIContainer.style.transform = "translate(-50%)";
+        UIContainer.style.boxShadow = "black 0px 4px 50px 20px";
 
         return UIContainer;
     }
