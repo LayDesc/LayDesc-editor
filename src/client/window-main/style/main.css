@@ -10,7 +10,7 @@ body {
 }
 
 #header-app {
-    background-color: blue;
+    background-color: black;
     width: 100%;
     padding: 0 70px 2px;
     overflow: hidden;
@@ -18,6 +18,10 @@ body {
     text-align: center;
     -webkit-app-region: drag;
     white-space: nowrap;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
 }
 
 #header-app h1 {
@@ -27,6 +31,16 @@ body {
     color: white;
     line-height: 20px;
     overflow: hidden;
+}
+
+#editor {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    padding-top: 22px;
 }
 
 ::selection {

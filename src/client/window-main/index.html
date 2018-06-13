@@ -1,19 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
     <head>
         <meta charset="UTF-8">
         <title>LayDesc—editor</title>
         <link rel="stylesheet" href="style/main.css">
     </head>
     <body>
-        <header id="header-app">
-            <h1>LayDesc—editor</h1>
-        </header>
         <main id="app">
-            <button id="generate">generate</button>
-            application content
+            <header id="header-app">
+                <h1>LayDesc—editor</h1>
+            </header>
+            <div id="editor"></div>
+            <footer id="footer-app"></footer>
         </main>
-        <footer id="footer-app"></footer>
-        <script type="text/javascript" src="main.js"></script>
     </body>
+
+        <script>
+            // Monaco uses a custom amd loader that overrides node's require.
+            // Keep a reference to node's require so we can restore it after executing the amd loader file.
+            const nodeRequire = global.require;
+        </script>
+        <script src="../../../node_modules/monaco-editor/min/vs/loader.js"></script>
+        <script>
+            // Save Monaco's amd require and restore Node's require
+            const amdRequire = global.require;
+            global.require = nodeRequire;
+        </script>
+        <script src="./main.js"></script>
 </html>

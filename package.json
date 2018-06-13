@@ -2,12 +2,14 @@
   "name": "laydesc-editor",
   "version": "0.0.1",
   "description": "LayDesc editor is an open-source html editor (based on Electron) to make the LayDesc document edition easier and more intelligible.",
-  "main": "dist/main.js",
+  "main": "dist/electron/main.js",
   "scripts": {
-    "build-tsc": "tsc",
+    "build-node": "tsc",
+    "build-client": "webpack",
+    "build": "build-node && build-client",
     "clean": "rm -rf ./dist/",
-    "build": "webpack",
-    "watch": "webpack --watch",
+    "watch-client": "webpack --watch",
+    "watch-node": "tsc --watch",
     "start": "electron ."
   },
   "repository": {
@@ -42,5 +44,8 @@
     "typescript": "^2.8.3",
     "webpack": "^4.9.1",
     "webpack-cli": "^2.1.4"
+  },
+  "dependencies": {
+    "monaco-editor": "^0.13.1"
   }
 }

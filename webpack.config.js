@@ -3,9 +3,9 @@ const srcDirectoryName = "src";
 const distDirectoryName = "dist";
 const mode = "development";
 
-// electron
-const electronSrcDirectory = path.join(__dirname, srcDirectoryName,"electron");
-const electronDistDirectory = path.join(__dirname, distDirectoryName);
+// // electron
+// const electronSrcDirectory = path.join(__dirname, srcDirectoryName,"electron");
+// const electronDistDirectory = path.join(__dirname, distDirectoryName);
 
 // client
 const clientSrcDirectory = path.join(__dirname, srcDirectoryName, "client");
@@ -15,29 +15,29 @@ const clientWindowNames = {
     generator: "window-generator",
 };
 
-const electron = {
-    target: "electron-main",
-    mode: mode,
-    entry:[
-        path.join(electronSrcDirectory, "main.ts"),
-    ],
-    output: {
-        filename: 'main.js',
-        path: electronDistDirectory,
-    },
-    resolve: {
-        // Add '.ts' and '.tsx' as a resolvable extension.
-        extensions: [".ts", ".tsx", ".js"]
-    },
-    module: {
-        rules: [
-            {
-                test: /\.tsx?$/,
-                loader: "ts-loader",
-            },
-        ]
-    }
-};
+// const electron = {
+//     target: "electron-main",
+//     mode: mode,
+//     entry:[
+//         path.join(electronSrcDirectory, "main.ts"),
+//     ],
+//     output: {
+//         filename: 'main.js',
+//         path: electronDistDirectory,
+//     },
+//     resolve: {
+//         // Add '.ts' and '.tsx' as a resolvable extension.
+//         extensions: [".ts", ".tsx", ".js"]
+//     },
+//     module: {
+//         rules: [
+//             {
+//                 test: /\.tsx?$/,
+//                 loader: "ts-loader",
+//             },
+//         ]
+//     }
+// };
 
 const clientsOptions = {
     target: "electron-renderer",
@@ -115,6 +115,9 @@ const client_main = {
         filename: 'main.js',
         path: path.join(clientDistDirectory, clientWindowNames.main),
     },
+    node: {
+        __dirname: false,
+    },
     target: clientsOptions.target,
     resolve: clientsOptions.resolve,
     module: clientsOptions.module,
@@ -134,10 +137,13 @@ const client_generator = {
         filename: 'main.js',
         path: path.join(clientDistDirectory, clientWindowNames.generator),
     },
+    node: {
+        __dirname: false,
+    },
     target: clientsOptions.target,
     resolve: clientsOptions.resolve,
     module: clientsOptions.module,
 };
 
 
-module.exports = [ electron, client_main, client_generator];
+module.exports = [client_main, client_generator];
