@@ -10,7 +10,7 @@ ipcRenderer.on("message", (event: Event, message: string) => {
     console.log(message);
 });
 
-ipcRenderer.on(IpcChannels.App.RENDERER, () => {
+ipcRenderer.on(IpcChannels.ElectronNode.RENDERER, () => {
     console.log("ok");
     test();
 });

@@ -12,7 +12,8 @@ const clientSrcDirectory = path.join(__dirname, srcDirectoryName, "client");
 const clientDistDirectory = path.join(__dirname, distDirectoryName, "client");
 const clientWindowNames = {
     main: "window-main",
-    generator: "window-renderer",
+    renderer: "window-renderer",
+    generator: "window-generator",
 };
 
 // const electron = {
@@ -131,7 +132,7 @@ const client_generator = {
     devServer: {
         contentBase: path.join( clientSrcDirectory, clientWindowNames.generator),
         compress: true,
-        port: 9000,
+        port: 9010,
     },
     output: {
         filename: 'main.js',
@@ -145,5 +146,27 @@ const client_generator = {
     module: clientsOptions.module,
 };
 
+const client_renderer = {
+    mode: mode,
+    entry: [
+        path.join( clientSrcDirectory, clientWindowNames.renderer, "main.ts" ),
+    ],
+    devServer: {
+        contentBase: path.join( clientSrcDirectory, clientWindowNames.renderer),
+        compress: true,
+        port: 9020,
+    },
+    output: {
+        filename: 'main.js',
+        path: path.join(clientDistDirectory, clientWindowNames.renderer),
+    },
+    node: {
+        __dirname: false,
+    },
+    target: clientsOptions.target,
+    resolve: clientsOptions.resolve,
+    module: clientsOptions.module,
+};
 
-module.exports = [client_main, client_generator];
+
+module.exports = [client_main, client_generator, client_renderer];

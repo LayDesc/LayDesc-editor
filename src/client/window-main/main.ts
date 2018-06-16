@@ -5,6 +5,9 @@ import {MonacoInitializer} from "./script/MonacoInitializer";
 import {LIBRARY_WORD} from "./script/LIBRARY_WORD";
 import {PositionParser} from "./script/lexer/PositionParser";
 
+import {ipcRenderer} from "electron";
+import {IpcChannels} from "../../_typescript-declarations/IpcChannels";
+
 require("./index.html");
 
 new MonacoInitializer(() => {
@@ -27,6 +30,7 @@ new MonacoInitializer(() => {
         editor.getJavascriptCompiled()
             .then((value) => {
                 console.log("value", value);
+                ipcRenderer.send(IpcChannels.WindowMain.JS_GENERATED, [value]);
             });
     });
 
