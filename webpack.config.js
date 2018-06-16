@@ -12,7 +12,7 @@ const clientSrcDirectory = path.join(__dirname, srcDirectoryName, "client");
 const clientDistDirectory = path.join(__dirname, distDirectoryName, "client");
 const clientWindowNames = {
     main: "window-main",
-    generator: "window-generator",
+    generator: "window-renderer",
 };
 
 // const electron = {
