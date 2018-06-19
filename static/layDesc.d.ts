@@ -182,8 +182,11 @@ declare module "elements/text/Text" {
     }
 }
 declare module "containers/generic/IContainerData" {
-    import { ITextSettings } from "elements/text/Text";
+    import { ITextData, ITextSettings } from "elements/text/Text";
     export interface IContainerData {
+        texts: ITextData[];
+    }
+    export interface IContainerSettings {
         texts: ITextSettings[];
     }
 }
@@ -193,19 +196,25 @@ declare module "containers/rectangleContainer/IRectangleContainerData" {
     import { IContainerData } from "containers/generic/IContainerData";
     export interface IRectangleContainerData extends IRectangleData, IContainerData {
         margin: IPaddingData;
+        cssExtended: ICssExtended;
+    }
+    export interface ICssExtended {
+        [key: string]: string;
     }
 }
 declare module "containers/rectangleContainer/IRectangleContainerSettings" {
     import { IPaddingSettings } from "geometry/generic/Padding";
     import { IRectangleSettings } from "geometry/Rectangle";
-    import { IContainerData } from "containers/generic/IContainerData";
-    export interface IRectangleContainerSettings extends IRectangleSettings, IContainerData {
+    import { IContainerSettings } from "containers/generic/IContainerData";
+    import { ICssExtended } from "containers/rectangleContainer/IRectangleContainerData";
+    export interface IRectangleContainerSettings extends IRectangleSettings, IContainerSettings {
         margin?: IPaddingSettings;
+        cssExtended?: ICssExtended;
     }
 }
 declare module "containers/rectangleContainer/RectangleContainer" {
     import { IRectangleContainerSettings } from "containers/rectangleContainer/IRectangleContainerSettings";
-    import { IRectangleContainerData } from "containers/rectangleContainer/IRectangleContainerData";
+    import { ICssExtended, IRectangleContainerData } from "containers/rectangleContainer/IRectangleContainerData";
     import { Padding } from "geometry/generic/Padding";
     import { Rectangle } from "geometry/Rectangle";
     import { Text } from "elements/text/Text";
@@ -213,12 +222,13 @@ declare module "containers/rectangleContainer/RectangleContainer" {
     export class RectangleContainer extends Rectangle implements IContainerData, IRectangleContainerData {
         margin: Padding;
         texts: Text[];
+        cssExtended: ICssExtended;
         constructor(settings: IRectangleContainerSettings);
         generate(): IRectangleContainerData;
     }
 }
 declare module "containers/_module_export" {
-    export { IRectangleContainerData } from "containers/rectangleContainer/IRectangleContainerData";
+    export { IRectangleContainerData, ICssExtended } from "containers/rectangleContainer/IRectangleContainerData";
     export { IRectangleContainerSettings } from "containers/rectangleContainer/IRectangleContainerSettings";
     export { RectangleContainer } from "containers/rectangleContainer/RectangleContainer";
 }
@@ -237,27 +247,36 @@ declare module "guide/Vertical" {
 declare module "guide/IGuideSettings" {
     import { Horizontal } from "guide/Horizontal";
     import { Vertical } from "guide/Vertical";
+    import { UNIT } from "geometry/generic/UNIT";
     export interface IGuideSettings {
         show: boolean;
         horizontal?: Horizontal[];
         vertical?: Vertical[];
-    }
-}
-declare module "page/pageTemplate/IPageTemplateSettings" {
-    import { IPaddingSettings } from "geometry/generic/Padding";
-    import { IRectangleContainerSettings } from "containers/rectangleContainer/IRectangleContainerSettings";
-    import { UNIT } from "geometry/generic/UNIT";
-    export interface IPageTemplateSettings {
-        name: string;
-        pageMargin?: IPaddingSettings;
-        containers?: IRectangleContainerSettings[];
         unit?: UNIT;
     }
 }
+declare module "page/generic/IGenericPageSettings" {
+    import { IPaddingSettings } from "geometry/generic/Padding";
+    import { IRectangleContainerSettings } from "containers/rectangleContainer/IRectangleContainerSettings";
+    import { UNIT } from "geometry/generic/UNIT";
+    import { ISizeSettings } from "geometry/generic/Size";
+    export interface IGenericPageSettings {
+        pageMargin?: IPaddingSettings;
+        containers?: IRectangleContainerSettings[];
+        unit?: UNIT;
+        size?: ISizeSettings;
+    }
+}
 declare module "page/page/IPageSettings" {
-    import { IPageTemplateSettings } from "page/pageTemplate/IPageTemplateSettings";
-    export interface IPageSettings extends IPageTemplateSettings {
+    import { IGenericPageSettings } from "page/generic/IGenericPageSettings";
+    export interface IPageSettings extends IGenericPageSettings {
         pageTemplateName?: string;
+    }
+}
+declare module "page/pageTemplate/IPageTemplateSettings" {
+    import { IGenericPageSettings } from "page/generic/IGenericPageSettings";
+    export interface IPageTemplateSettings extends IGenericPageSettings {
+        name: string;
     }
 }
 declare module "document/IDocumentSettings" {
@@ -269,6 +288,7 @@ declare module "document/IDocumentSettings" {
         guides?: IGuideSettings;
         pageTemplates?: IPageTemplateSettings[];
         arrayOfPage?: IPageSettings[];
+        scale?: number;
     }
 }
 declare module "env" {
@@ -288,50 +308,69 @@ declare module "env" {
         function _helloMessage(): void;
     }
 }
-declare module "page/pageTemplate/IPageTemplateData" {
-    import { IPaddingData } from "geometry/generic/Padding";
-    import { IRectangleContainerData } from "containers/rectangleContainer/IRectangleContainerData";
+declare module "page/generic/IGenericPageData" {
     import { UNIT } from "geometry/generic/UNIT";
-    export interface IPageTemplateData {
-        name: string;
+    import { IRectangleContainerData } from "containers/rectangleContainer/IRectangleContainerData";
+    import { IPaddingData } from "geometry/generic/Padding";
+    import { ISizeData } from "geometry/generic/Size";
+    export interface IGenericPageData {
         pageMargin: IPaddingData;
         containers: IRectangleContainerData[];
         unit: UNIT;
+        size: ISizeData;
     }
 }
-declare module "page/pageTemplate/PageTemplate" {
-    import { Padding } from "geometry/generic/Padding";
-    import { IPageTemplateSettings } from "page/pageTemplate/IPageTemplateSettings";
-    import { IPageTemplateData } from "page/pageTemplate/IPageTemplateData";
-    import { RectangleContainer } from "containers/rectangleContainer/RectangleContainer";
-    import { IRectangleContainerSettings } from "containers/rectangleContainer/IRectangleContainerSettings";
-    import { Document } from "document/Document";
-    import { UNIT } from "geometry/generic/UNIT";
-    export class PageTemplate implements IPageTemplateData {
+declare module "page/pageTemplate/IPageTemplateData" {
+    import { IGenericPageData } from "page/generic/IGenericPageData";
+    export interface IPageTemplateData extends IGenericPageData {
         name: string;
+    }
+}
+declare module "page/generic/GenericPage" {
+    import { IGenericPageData } from "page/generic/IGenericPageData";
+    import { RectangleContainer } from "containers/rectangleContainer/RectangleContainer";
+    import { UNIT } from "geometry/generic/UNIT";
+    import { Padding } from "geometry/generic/Padding";
+    import { Document } from "document/Document";
+    import { IRectangleContainerSettings } from "containers/rectangleContainer/IRectangleContainerSettings";
+    import { IGenericPageSettings } from "page/generic/IGenericPageSettings";
+    import { Size } from "geometry/generic/Size";
+    export class GenericPage implements IGenericPageData {
         pageMargin: Padding;
         containers: RectangleContainer[];
         unit: UNIT;
+        size: Size;
         readonly documentParents: Document[];
         protected _documentParents: Document[];
         private static _defaultSettings;
-        constructor(settings: IPageTemplateSettings);
+        constructor(settings: IGenericPageSettings);
         addArrayOfContainers(containers: IRectangleContainerSettings[]): RectangleContainer[];
+    }
+}
+declare module "page/pageTemplate/PageTemplate" {
+    import { IPageTemplateSettings } from "page/pageTemplate/IPageTemplateSettings";
+    import { IPageTemplateData } from "page/pageTemplate/IPageTemplateData";
+    import { GenericPage } from "page/generic/GenericPage";
+    export class PageTemplate extends GenericPage implements IPageTemplateData {
+        name: string;
+        constructor(settings: IPageTemplateSettings);
         generate(): IPageTemplateData;
     }
 }
 declare module "guide/IGuideData" {
     import { Horizontal } from "guide/Horizontal";
     import { Vertical } from "guide/Vertical";
+    import { UNIT } from "geometry/generic/UNIT";
     export interface IGuideData {
         show: boolean;
         horizontal: Horizontal[];
         vertical: Vertical[];
+        unit: UNIT;
     }
 }
 declare module "page/page/IPageData" {
-    import { IPageTemplateData } from "page/pageTemplate/IPageTemplateData";
-    export interface IPageData extends IPageTemplateData {
+    import { IGenericPageData } from "page/generic/IGenericPageData";
+    export interface IPageData extends IGenericPageData {
         pageTemplateName?: string;
     }
 }
@@ -344,16 +383,17 @@ declare module "document/IDocumentData" {
         guides: IGuideData;
         listOfPageTemplate: IListOfPageTemplate;
         arrayOfPage: IPageData[];
+        scale: number;
     }
     export interface IListOfPageTemplate {
         [key: string]: IPageTemplateData;
     }
 }
 declare module "page/page/Page" {
-    import { PageTemplate } from "page/pageTemplate/PageTemplate";
     import { IPageData } from "page/page/IPageData";
     import { IPageSettings } from "page/page/IPageSettings";
-    export class Page extends PageTemplate implements IPageData {
+    import { GenericPage } from "page/generic/GenericPage";
+    export class Page extends GenericPage implements IPageData {
         pageTemplateName?: string;
         constructor(settings: IPageSettings);
         autoContent(): void;
@@ -372,6 +412,7 @@ declare module "document/Document" {
         guides: IGuideData;
         listOfPageTemplate: IListOfPageTemplate;
         arrayOfPage: Page[];
+        scale: number;
         private static _defaultSettings;
         private _this;
         constructor(settings: IDocumentSettings);
@@ -447,6 +488,9 @@ declare module "guide/_module_export" {
     export { Vertical } from "guide/Vertical";
 }
 declare module "page/_module_export" {
+    export { IGenericPageData } from "page/generic/IGenericPageData";
+    export { IGenericPageSettings } from "page/generic/IGenericPageSettings";
+    export { GenericPage } from "page/generic/GenericPage";
     export { IPageData } from "page/page/IPageData";
     export { IPageSettings } from "page/page/IPageSettings";
     export { Page } from "page/page/Page";
@@ -459,8 +503,8 @@ declare module "tools/loremIpsum" {
 }
 declare module "tools/rectangleContainerGenerator/IRectangleContainerGeneratorSettings" {
     import { UNIT } from "geometry/generic/UNIT";
-    import { IContainerData } from "containers/generic/IContainerData";
-    export interface IRectangleContainerGeneratorSettings extends IContainerData {
+    import { IContainerSettings } from "containers/generic/IContainerData";
+    export interface IRectangleContainerGeneratorSettings extends IContainerSettings {
         width: number;
         height: number;
         unit: UNIT;
@@ -524,10 +568,165 @@ declare module "tools/rectangleContainerGenerator/RectangleContainerGenerator" {
         private _setFontParametersToElement(element, fontData);
     }
 }
+declare module "tools/FONT_USER" {
+    export module FONT_USER {
+        enum GT_AMERICA {
+            GTAmericaBlackItalic = "GTAmerica-BlackItalic",
+            GTAmericaBlack = "GTAmerica-Black",
+            GTAmericaBoldItalic = "GTAmerica-BoldItalic",
+            GTAmericaBold = "GTAmerica-Bold",
+            GTAmericaCompressedBlackItalic = "GTAmerica-CompressedBlackItalic",
+            GTAmericaCompressedBlack = "GTAmerica-CompressedBlack",
+            GTAmericaCompressedBoldItalic = "GTAmerica-CompressedBoldItalic",
+            GTAmericaCompressedBold = "GTAmerica-CompressedBold",
+            GTAmericaCompressedLightItalic = "GTAmerica-CompressedLightItalic",
+            GTAmericaCompressedLight = "GTAmerica-CompressedLight",
+            GTAmericaCompressedMediumItalic = "GTAmerica-CompressedMediumItalic",
+            GTAmericaCompressedMedium = "GTAmerica-CompressedMedium",
+            GTAmericaCompressedRegularItalic = "GTAmerica-CompressedRegularItalic",
+            GTAmericaCompressedRegular = "GTAmerica-CompressedRegular",
+            GTAmericaCompressedThinItalic = "GTAmerica-CompressedThinItalic",
+            GTAmericaCompressedThin = "GTAmerica-CompressedThin",
+            GTAmericaCompressedUltraLightItalic = "GTAmerica-CompressedUltraLightItalic",
+            GTAmericaCompressedUltraLight = "GTAmerica-CompressedUltraLight",
+            GTAmericaCondensedBlackItalic = "GTAmerica-CondensedBlackItalic",
+            GTAmericaCondensedBlack = "GTAmerica-CondensedBlack",
+            GTAmericaCondensedBoldItalic = "GTAmerica-CondensedBoldItalic",
+            GTAmericaCondensedBold = "GTAmerica-CondensedBold",
+            GTAmericaCondensedLightItalic = "GTAmerica-CondensedLightItalic",
+            GTAmericaCondensedLight = "GTAmerica-CondensedLight",
+            GTAmericaCondensedMediumItalic = "GTAmerica-CondensedMediumItalic",
+            GTAmericaCondensedMedium = "GTAmerica-CondensedMedium",
+            GTAmericaCondensedRegularItalic = "GTAmerica-CondensedRegularItalic",
+            GTAmericaCondensedRegular = "GTAmerica-CondensedRegular",
+            GTAmericaCondensedThinItalic = "GTAmerica-CondensedThinItalic",
+            GTAmericaCondensedThin = "GTAmerica-CondensedThin",
+            GTAmericaCondensedUltraLightItalic = "GTAmerica-CondensedUltraLightItalic",
+            GTAmericaCondensedUltraLight = "GTAmerica-CondensedUltraLight",
+            GTAmericaExpandedBlackItalic = "GTAmerica-ExpandedBlackItalic",
+            GTAmericaExpandedBlack = "GTAmerica-ExpandedBlack",
+            GTAmericaExpandedBoldItalic = "GTAmerica-ExpandedBoldItalic",
+            GTAmericaExpandedBold = "GTAmerica-ExpandedBold",
+            GTAmericaExpandedLightItalic = "GTAmerica-ExpandedLightItalic",
+            GTAmericaExpandedLight = "GTAmerica-ExpandedLight",
+            GTAmericaExpandedMediumItalic = "GTAmerica-ExpandedMediumItalic",
+            GTAmericaExpandedMedium = "GTAmerica-ExpandedMedium",
+            GTAmericaExpandedRegularItalic = "GTAmerica-ExpandedRegularItalic",
+            GTAmericaExpandedRegular = "GTAmerica-ExpandedRegular",
+            GTAmericaExpandedThinItalic = "GTAmerica-ExpandedThinItalic",
+            GTAmericaExpandedThin = "GTAmerica-ExpandedThin",
+            GTAmericaExpandedUltraLightItalic = "GTAmerica-ExpandedUltraLightItalic",
+            GTAmericaExpandedUltraLight = "GTAmerica-ExpandedUltraLight",
+            GTAmericaExtendedBlackItalic = "GTAmerica-ExtendedBlackItalic",
+            GTAmericaExtendedBlack = "GTAmerica-ExtendedBlack",
+            GTAmericaExtendedBoldItalic = "GTAmerica-ExtendedBoldItalic",
+            GTAmericaExtendedBold = "GTAmerica-ExtendedBold",
+            GTAmericaExtendedLightItalic = "GTAmerica-ExtendedLightItalic",
+            GTAmericaExtendedLight = "GTAmerica-ExtendedLight",
+            GTAmericaExtendedMediumItalic = "GTAmerica-ExtendedMediumItalic",
+            GTAmericaExtendedMedium = "GTAmerica-ExtendedMedium",
+            GTAmericaExtendedRegularItalic = "GTAmerica-ExtendedRegularItalic",
+            GTAmericaExtendedRegular = "GTAmerica-ExtendedRegular",
+            GTAmericaExtendedThinItalic = "GTAmerica-ExtendedThinItalic",
+            GTAmericaExtendedThin = "GTAmerica-ExtendedThin",
+            GTAmericaExtendedUltraLightItalic = "GTAmerica-ExtendedUltraLightItalic",
+            GTAmericaExtendedUltraLight = "GTAmerica-ExtendedUltraLight",
+            GTAmericaLightItalic = "GTAmericaLightItalic",
+            GTAmericaLight = "GTAmericaLight",
+            GTAmericaMediumItalic = "GTAmerica-MediumItalic",
+            GTAmericaMedium = "GTAmerica-Medium",
+            GTAmericaMonoBlackItalic = "GTAmerica-MonoBlackItalic",
+            GTAmericaMonoBlack = "GTAmerica-MonoBlack",
+            GTAmericaMonoBoldItalic = "GTAmerica-MonoBoldItalic",
+            GTAmericaMonoBold = "GTAmerica-MonoBold",
+            GTAmericaMonoLightItalic = "GTAmerica-MonoLightItalic",
+            GTAmericaMonoLight = "GTAmerica-MonoLight",
+            GTAmericaMonoMediumItalic = "GTAmerica-MonoMediumItalic",
+            GTAmericaMonoMedium = "GTAmerica-MonoMedium",
+            GTAmericaMonoRegularItalic = "GTAmerica-MonoRegularItalic",
+            GTAmericaMonoRegular = "GTAmerica-MonoRegular",
+            GTAmericaMonoThinItalic = "GTAmerica-MonoThinItalic",
+            GTAmericaMonoThin = "GTAmerica-MonoThin",
+            GTAmericaMonoUltraLightItalic = "GTAmerica-MonoUltraLightItalic",
+            GTAmericaMonoUltraLight = "GTAmerica-MonoUltraLight",
+            GTAmericaRegularItalic = "GTAmerica-RegularItalic",
+            GTAmericaRegular = "GTAmerica-Regular",
+            GTAmericaThinItalic = "GTAmerica-ThinItalic",
+            GTAmericaThin = "GTAmerica-Thin",
+            GTAmericaUltraLightItalic = "GTAmerica-UltraLightItalic",
+            GTAmericaUltraLight = "GTAmerica-UltraLight",
+        }
+        enum Reckless {
+            RecklessBold = "RecklessTRIAL-Bold",
+            RecklessHeavy = "RecklessTRIAL-Heavy",
+            RecklessLight = "RecklessTRIAL-Light",
+            RecklessMedium = "RecklessTRIAL-Medium",
+            RecklessRegular = "RecklessTRIAL-Regular",
+            RecklessSemiBold = "RecklessTRIAL-SemiBold",
+        }
+        enum PxGrotesk {
+            PxGroteskBoldItalic = "Px Grotesk Bold Italic",
+            PxGroteskBold = "Px Grotesk Bold",
+            PxGroteskLightItalic = "Px Grotesk Light Italic",
+            PxGroteskLight = "Px Grotesk Light",
+            PxGroteskRegularItalic = "Px Grotesk Regular Italic",
+            PxGroteskRegular = "Px Grotesk Regular",
+            PxGroteskScreen = "Px Grotesk Screen",
+        }
+        enum SangBleu {
+            SangBleuEmpireBlack = "SangBleuEmpire-Black",
+            SangBleuEmpireBlackItalic = "SangBleuEmpire-BlackItalic",
+            SangBleuEmpireBold = "SangBleuEmpire-Bold",
+            SangBleuEmpireBoldItalic = "SangBleuEmpire-BoldItalic",
+            SangBleuEmpireMedium = "SangBleuEmpire-Medium",
+            SangBleuEmpireMediumItalic = "SangBleuEmpire-MediumItalic",
+            SangBleuEmpireRegular = "SangBleuEmpire-Regular",
+            SangBleuEmpireRegularItalic = "SangBleuEmpire-RegularItalic",
+            SangBleuKingdomAir = "SangBleuKingdom-Air",
+            SangBleuKingdomAirItalic = "SangBleuKingdom-AirItalic",
+            SangBleuKingdomBold = "SangBleuKingdom-Bold",
+            SangBleuKingdomBoldItalic = "SangBleuKingdom-BoldItalic",
+            SangBleuKingdomLight = "SangBleuKingdom-Light",
+            SangBleuKingdomLightItalic = "SangBleuKingdom-LightItalic",
+            SangBleuKingdomMedium = "SangBleuKingdom-Medium",
+            SangBleuKingdomMediumItalic = "SangBleuKingdom-MediumItalic",
+            SangBleuKingdomRegular = "SangBleuKingdom-Regular",
+            SangBleuKingdomRegularItalic = "SangBleuKingdom-RegularItalic",
+            SangBleuRepublicBold = "SangBleuRepublic-Bold",
+            SangBleuRepublicBoldItalic = "SangBleuRepublic-BoldItalic",
+            SangBleuRepublicBook = "SangBleuRepublic-Book",
+            SangBleuRepublicBookItalic = "SangBleuRepublic-BookItalic",
+            SangBleuRepublicMedium = "SangBleuRepublic-Medium",
+            SangBleuRepublicMediumItalic = "SangBleuRepublic-MediumItalic",
+            SangBleuRepublicRegular = "SangBleuRepublic-Regular",
+            SangBleuRepublicRegularItalic = "SangBleuRepublic-RegularItalic",
+            SangBleuSunriseAir = "SangBleuSunrise-Air",
+            SangBleuSunriseAirItalic = "SangBleuSunrise-AirItalic",
+            SangBleuSunriseBold = "SangBleuSunrise-Bold",
+            SangBleuSunriseBoldItalic = "SangBleuSunrise-BoldItalic",
+            SangBleuSunriseLight = "SangBleuSunrise-Light",
+            SangBleuSunriseLightItalic = "SangBleuSunrise-LightItalic",
+            SangBleuSunriseLivre = "SangBleuSunrise-Livre",
+            SangBleuSunriseMedium = "SangBleuSunrise-Medium",
+            SangBleuSunriseMediumItalic = "SangBleuSunrise-MediumItalic",
+            SangBleuSunriseRegular = "SangBleuSunrise-Regular",
+            SangBleuSunriseRegularItalic = "SangBleuSunrise-RegularItalic",
+            SangBleuVersaillesBold = "SangBleuVersailles-Bold",
+            SangBleuVersaillesBoldItalic = "SangBleuVersailles-BoldItalic",
+            SangBleuVersaillesBook = "SangBleuVersailles-Book",
+            SangBleuVersaillesBookItalic = "SangBleuVersailles-BookItalic",
+            SangBleuVersaillesMedium = "SangBleuVersailles-Medium",
+            SangBleuVersaillesMediumItalic = "SangBleuVersailles-MediumItalic",
+            SangBleuVersaillesRegular = "SangBleuVersailles-Regular",
+            SangBleuVersaillesRegularItalic = "SangBleuVersailles-RegularItalic",
+        }
+    }
+}
 declare module "tools/_module_export" {
     export { loremIpsum } from "tools/loremIpsum";
     export { IRectangleContainerGeneratorSettings } from "tools/rectangleContainerGenerator/IRectangleContainerGeneratorSettings";
     export { RectangleContainerGenerator, TextMetric } from "tools/rectangleContainerGenerator/RectangleContainerGenerator";
+    export { FONT_USER } from "tools/FONT_USER";
 }
 declare module "main" {
     import * as containers from "containers/_module_export";

@@ -4,9 +4,10 @@
   "description": "LayDesc editor is an open-source html editor (based on Electron) to make the LayDesc document edition easier and more intelligible.",
   "main": "dist/electron/main.js",
   "scripts": {
+    "import-lib": "cp -r /Users/azertypow/Documents/appDev/_LayDesc/LayDesc-api/src/ ./src/client/window-renderer/lib/",
     "build-node": "tsc",
     "build-client": "webpack",
-    "build": "build-node && build-client",
+    "build": "import-lib && build-node && build-client",
     "clean": "rm -rf ./dist/",
     "watch-client": "webpack --watch",
     "watch-node": "tsc --watch",

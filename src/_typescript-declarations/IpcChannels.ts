@@ -4,7 +4,6 @@ import {IDocumentData} from "document/IDocumentData";
 
 export namespace IpcChannels {
     export enum WindowMain {
-        RENDERER = "FROM_MAIN_RENDERER",
         JS_GENERATED = "JS_GENERATED",
     }
     export interface JS_GENERATED_data {
@@ -23,7 +22,7 @@ export namespace IpcChannels {
     }
 
     export enum ElectronNode {
-        RENDERER = "FROM_APP_RENDERER",
         EMIT_JS_GENERATED = "EMIT_JS_GENERATED",
+        EMIT_DOC_GENERATED = "EMIT_DOC_GENERATED",
     }
 }

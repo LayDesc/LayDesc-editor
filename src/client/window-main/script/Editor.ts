@@ -2,6 +2,10 @@ import * as ts from "typescript";
 import {getEditorValue} from "./getEditorValue";
 import {getDescription} from "./layDescDescription";
 import {testValue} from "./hisotyValue/test";
+import {libraryValue} from "./hisotyValue/libraryTesting";
+import {presentation} from "./hisotyValue/presentation";
+import {experimentation} from "./hisotyValue/experimentations";
+import {__presentation} from "./hisotyValue/__presentation";
 
 declare const amdRequire: any;
 
@@ -26,7 +30,7 @@ export class Editor {
         this._addLayDescLibrary();
 
         this.editor = monaco.editor.create(document.getElementById('editor') as HTMLElement, {
-            value: testValue(),
+            value: __presentation(),
             language: 'typescript',
             fontLigatures:  true,
             theme: "myCustomTheme",

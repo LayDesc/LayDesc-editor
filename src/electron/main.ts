@@ -20,7 +20,12 @@ function startLayDescEditor() {
     });
 
     ipcMain.on(IpcChannels.WindowMain.JS_GENERATED, (event: Event, args: IpcChannels.JS_GENERATED_data) => {
-        if(generatorWindow === null) generatorWindow = createGeneratorWindow();
+        if(generatorWindow === null) {
+            generatorWindow = createGeneratorWindow();
+            generatorWindow.on('closed', () => {
+                generatorWindow = null
+            });
+        }
         (generatorWindow as BrowserWindow).webContents.send(IpcChannels.ElectronNode.EMIT_JS_GENERATED, args);
     });
 
@@ -31,13 +36,16 @@ function startLayDescEditor() {
         console.log(listOfRendererWindow);
         console.log("—————");
 
-        const windowRendererForThisLayDescDocumentIsOpen = listOfRendererWindow[args.docName] === void 0 || listOfRendererWindow[args.docName] === null;
-        if( windowRendererForThisLayDescDocumentIsOpen ) {
+        const windowRendererForThisLayDescDocumentIs_notOpen = listOfRendererWindow[args.docName] === void 0 || listOfRendererWindow[args.docName] === null;
+        if( windowRendererForThisLayDescDocumentIs_notOpen ) {
             listOfRendererWindow[args.docName] = createRendererWindow();
             (listOfRendererWindow[args.docName] as BrowserWindow).on('closed', () => {
                 listOfRendererWindow[args.docName] = null;
             });
         }
+
+        (listOfRendererWindow[args.docName] as BrowserWindow).webContents.send(IpcChannels.ElectronNode.EMIT_DOC_GENERATED, args.value);
+
     });
 
     // // https://electronjs.org/docs/api/window-open
