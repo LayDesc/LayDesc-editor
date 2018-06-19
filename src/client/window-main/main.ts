@@ -34,12 +34,13 @@ new MonacoInitializer(() => {
             });
     });
 
-
+    let _positionParser: PositionParser | null;
     let _userInterface: HTMLElement | null = null;
     function UIPlugin() {
         if (editor.getTokenAtCursorPosition().type === "identifier.ts") {
             if(editor.getWordAtCursorPosition().word === LIBRARY_WORD.POSITION) {
-                new PositionParser(editor)
+                _positionParser = new PositionParser(editor);
+                _positionParser
                     .createUserInterface()
                     .then((value) => {
                         if( typeof value === "string") {
@@ -57,6 +58,10 @@ new MonacoInitializer(() => {
         if(_userInterface !== null) {
             document.body.removeChild(_userInterface);
             _userInterface = null;
+        }
+
+        if(_positionParser !== null) {
+            _positionParser
         }
     }
 
