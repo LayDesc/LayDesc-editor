@@ -35,7 +35,7 @@ export class LayDescRenderer {
     rendererDocument() {
         const documentData = this._layDescDocumentData;
 
-        this._containerElement.style.transform = `scale(${this._layDescDocumentData.scale}, ${this._layDescDocumentData.scale})`;
+        // this._containerElement.style.transform = `scale(${this._layDescDocumentData.scale}, ${this._layDescDocumentData.scale})`;
 
         this.cleanDocumentContainer();
 
