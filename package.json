@@ -42,6 +42,7 @@
     "file-loader": "^1.1.11",
     "html-loader": "^0.5.5",
     "ts-loader": "^4.3.0",
+    "ttf-loader": "^1.0.2",
     "typescript": "^2.8.3",
     "webpack": "^4.9.1",
     "webpack-cli": "^2.1.4"

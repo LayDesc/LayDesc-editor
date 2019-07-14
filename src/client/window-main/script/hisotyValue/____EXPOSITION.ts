@@ -1,11 +1,5 @@
-export function __presentation() {
+export function ____EXPOSITION() {
     return `
-
-
-
-
-
-
 import * as layDesc from 'main'
 /**
  * layDesc internal HEADER
@@ -92,7 +86,7 @@ interface PageColumn {
 
 const A3marginValue = 10;
 const A3LeftMarginValue = A3marginValue * 2;
-const marginShow = true;
+const marginShow = false;
 
 
 // A3
@@ -292,14 +286,15 @@ const colorPuissance = 100;
 // example 1.1 (p.2)
 // example 3.1 (p.2)
 const pageColumn: PageColumn = {
-
+    columnGap: 10,
+    columns: 2,
 }
 A3page1.addArrayOfContainers([
     {
         texts: [
             {
                 // example 2.1 (p. 2)
-                content: \`The Lisa Computer System\`,
+                content: \`The Lisa Computer System\`,
                 style: A3StyleTitle,
             },
             {
@@ -445,7 +440,7 @@ A3page2.addArrayOfContainers([
 
             // example 1.2 (p.3)
             // example 3.3 (p.2)
-            "background-blend-mode": FILTER.normal,
+            "background-blend-mode": filter,
         },
         unit: UNIT.PX,
         anchor: ANCHOR.TOP_RIGHT,
@@ -671,17 +666,17 @@ const image2: layDesc.containers.IRectangleContainerSettings = {
 
     // example 2.2 (p.4)
     size: {
-        height: 18 * 10,
+        height: 23 * 10,
         width: 7 * 10,
     },
 
     // example 2.3 (p.4)
-    anchor: ANCHOR.BOTTOM_RIGHT,
+    anchor: ANCHOR.TOP_LEFT,
 
     // example 2.4 (p.4)
     position: {
-        x: 0,
-        y: 0,
+x: 25,
+y: 145,
     },
 }
 
@@ -690,8 +685,8 @@ const image: layDesc.containers.IRectangleContainerSettings = {
 
     // example 2.5 (p.4)
     position: {
-        x: 0,
-        y: 147,
+x: 312,
+y: 153,
     },
     cssExtended: {
         backgroundImage: "url(../../../static/img/1bigGREY.jpg)",
@@ -722,7 +717,7 @@ const A3pageRepetition = new Page({
 const imageRepetionSize = 11;
 
 // example 3.4
-const wordCounter = 1;
+const wordCounter = 8;
 
 A3pageRepetition.addArrayOfContainers([
     {
@@ -741,27 +736,35 @@ A3pageRepetition.addArrayOfContainers([
     }
 ]);
 
-for(let i = 0; i < wordCounter; i++) {
-A3pageRepetition.containers.push(new RectangleContainer({
-    texts: [{
-        content: "Apple designs a new kind of machine.",
-        style: {
-            font: {
-                fontFamily: FONT_USER.GT_AMERICA.GTAmericaExtendedMedium,
-                fontSize: 9 * 10,
-                lineHeight: 7 * 10,
-            }
-        }
-    }],
-    size: A3.size,
+// text
+const indentationPosition = {
     position: {
-        x: 0,
-        y: i * 14,
-    },
-    cssExtended: {
-        opacity: 1 / (1 + i) + "",
+x: 5,
+y: 5,
     }
-}));
+}
+
+for(let i = 1; i < wordCounter; i++) {
+    A3pageRepetition.containers.push(new RectangleContainer({
+        texts: [{
+            content: "Apple designs a new kind of machine.",
+            style: {
+                font: {
+                    fontFamily: FONT_USER.GT_AMERICA.GTAmericaExtendedMedium,
+                    fontSize: 9 * 10,
+                    lineHeight: 7 * 10,
+                }
+            }
+        }],
+        size: A3.size,
+        position: {
+            x: indentationPosition.position.x * i / 10,
+            y: indentationPosition.position.y * i / 10,
+        },
+        cssExtended: {
+            opacity: 1 / i + "",
+        }
+    }));
 }
 
 
@@ -788,10 +791,5 @@ layDescDocument.push(docA3, docA4);
 /**
  * end FOOTER
  */
-
-    
-
-    
-    
-    
-`}
+`
+}
